@@ -1,6 +1,7 @@
 package com.rafal.totallynotredditclone.service;
 
 import com.rafal.totallynotredditclone.dto.RegisterRequest;
+import com.rafal.totallynotredditclone.exceptions.EmailException;
 import com.rafal.totallynotredditclone.model.NotificationEmail;
 import com.rafal.totallynotredditclone.model.User;
 import com.rafal.totallynotredditclone.model.VerificationToken;
@@ -12,7 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotBlank;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -48,5 +51,17 @@ public class AuthenticationService {
 
         verificationTokenRepository.save(verificationToken);
         return token;
+    }
+
+    public void verifyAccount(String token) {
+        Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
+        verificationToken.orElseThrow(() -> new EmailException("Invalid Token"));
+        fetchUserAndEnable(verificationToken.get());
+    }
+
+    private void fetchUserAndEnable(VerificationToken verificationToken) {
+        @NotBlank(message = "Username is required") String username = verificationToken.getUser().getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new EmailException("Username with name - " + username + " not found."));
+        user.setEnabled(true);
     }
 }
