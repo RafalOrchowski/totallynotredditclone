@@ -1,5 +1,7 @@
 package com.rafal.totallynotredditclone.controller;
 
+import com.rafal.totallynotredditclone.dto.AuthenticationResponse;
+import com.rafal.totallynotredditclone.dto.LoginRequest;
 import com.rafal.totallynotredditclone.dto.RegisterRequest;
 import com.rafal.totallynotredditclone.service.AuthenticationService;
 import lombok.AllArgsConstructor;
@@ -24,5 +26,10 @@ public class AuthenticationController {
     public ResponseEntity<String> verifyAccount(@PathVariable String token) {
         authenticationService.verifyAccount(token);
         return new ResponseEntity<>("Account Activated Successfully", HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public AuthenticationResponse login(@RequestBody LoginRequest loginRequest) {
+        return authenticationService.login(loginRequest);
     }
 }
