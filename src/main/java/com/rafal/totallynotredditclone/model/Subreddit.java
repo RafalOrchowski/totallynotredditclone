@@ -22,9 +22,9 @@ public class Subreddit {
     private Long id;
     private String name;
     private String description;
-    @OneToMany(fetch = LAZY)
+    @OneToMany(fetch = LAZY) //creates subreddit_posts
     private List<Post> posts;
     private Instant createdDate; // could be LocalDateTime
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = LAZY) //creates use_user_id column
     private User user;
 }

@@ -14,10 +14,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
 
-@Data
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
+
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
