@@ -1,30 +1,30 @@
 package com.rafal.totallynotredditclone.model;
 
+import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.Instant;
-import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 
 @Data
-@Entity
 @Builder
-@AllArgsConstructor
+@Entity
 @NoArgsConstructor
-public class Subreddit {
+@AllArgsConstructor
+public class Vote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
-    private String description;
-    @OneToMany(fetch = LAZY)
-    private List<Post> posts;
-    private Instant createdDate; // could be LocalDateTime
+    private Long voteId;
+    private VoteType voteType;
+    @NotNull
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "postId", referencedColumnName = "postId")
+    private Post post;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "userId", referencedColumnName = "userId")
     private User user;
 }

@@ -7,24 +7,19 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.List;
-
-import static javax.persistence.FetchType.LAZY;
 
 @Data
-@Entity
 @Builder
-@AllArgsConstructor
+@Entity
 @NoArgsConstructor
-public class Subreddit {
+@AllArgsConstructor
+@Table(name = "token")
+public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String description;
-    @OneToMany(fetch = LAZY)
-    private List<Post> posts;
-    private Instant createdDate; // could be LocalDateTime
-    @ManyToOne(fetch = LAZY)
+    private String token;
+    @OneToOne(fetch = FetchType.LAZY)
     private User user;
+    private Instant expiryDate;
 }

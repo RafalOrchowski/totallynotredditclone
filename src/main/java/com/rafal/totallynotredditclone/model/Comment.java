@@ -6,25 +6,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
-import java.util.List;
-
-import static javax.persistence.FetchType.LAZY;
 
 @Data
-@Entity
 @Builder
-@AllArgsConstructor
+@Entity
 @NoArgsConstructor
-public class Subreddit {
+@AllArgsConstructor
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String description;
-    @OneToMany(fetch = LAZY)
-    private List<Post> posts;
-    private Instant createdDate; // could be LocalDateTime
-    @ManyToOne(fetch = LAZY)
+    @NotEmpty
+    private String text;
+    @ManyToOne
+    @JoinColumn(name = "postId", referencedColumnName = "postId")
+    private Post post;
+    private Instant createdDate;
+    @ManyToOne
+    @JoinColumn(name = "userId", referencedColumnName = "userId")
     private User user;
 }
