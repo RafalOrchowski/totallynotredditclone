@@ -1,17 +1,20 @@
 package com.rafal.totallynotredditclone.mapper;
 
+import com.github.marlonlom.utilities.timeago.TimeAgo;
 import com.rafal.totallynotredditclone.dto.PostRequest;
 import com.rafal.totallynotredditclone.dto.PostResponse;
-import com.rafal.totallynotredditclone.model.Post;
-import com.rafal.totallynotredditclone.model.Subreddit;
-import com.rafal.totallynotredditclone.model.User;
-import com.rafal.totallynotredditclone.model.VoteType;
+import com.rafal.totallynotredditclone.model.*;
 import com.rafal.totallynotredditclone.repository.CommentRepository;
 import com.rafal.totallynotredditclone.repository.VoteRepository;
 import com.rafal.totallynotredditclone.service.AuthenticationService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Optional;
+
+import static com.rafal.totallynotredditclone.model.VoteType.DOWNVOTE;
+import static com.rafal.totallynotredditclone.model.VoteType.UPVOTE;
 
 @Mapper(componentModel = "spring")
 public abstract class PostMapper {
@@ -39,32 +42,32 @@ public abstract class PostMapper {
     @Mapping(target = "upVote", expression = "java(isPostUpVoted(post))")
     @Mapping(target = "downVote", expression = "java(isPostDownVoted(post))")
     public abstract PostResponse mapToDto(Post post);
-//
-//    Integer commentCount(Post post) {
-//        return commentRepository.findByPost(post).size();
-//    }
-//
-//    String getDuration(Post post) {
-//        return TimeAgo.using(post.getCreatedDate().toEpochMilli());
-//    }
-//
-//    boolean isPostUpVoted(Post post) {
-//        return checkVoteType(post, UPVOTE);
-//    }
-//
-//    boolean isPostDownVoted(Post post) {
-//        return checkVoteType(post, DOWNVOTE);
-//    }
-//
-//    private boolean checkVoteType(Post post, VoteType voteType) {
-//        if (authService.isLoggedIn()) {
-//            Optional<Vote> voteForPostByUser =
-//                    voteRepository.findTopByPostAndUserOrderByVoteIdDesc(post,
-//                            authService.getCurrentUser());
-//            return voteForPostByUser.filter(vote -> vote.getVoteType().equals(voteType))
-//                    .isPresent();
-//        }
-//        return false;
-//    }
+
+    Integer commentCount(Post post) {
+        return commentRepository.findByPost(post).size();
+    }
+
+    String getDuration(Post post) {
+        return TimeAgo.using(post.getCreatedDate().toEpochMilli());
+    }
+
+    boolean isPostUpVoted(Post post) {
+        return checkVoteType(post, UPVOTE);
+    }
+
+    boolean isPostDownVoted(Post post) {
+        return checkVoteType(post, DOWNVOTE);
+    }
+
+    private boolean checkVoteType(Post post, VoteType voteType) {
+        if (authService.isLoggedIn()) {
+            Optional<Vote> voteForPostByUser =
+                    voteRepository.findTopByPostAndUserOrderByVoteIdDesc(post,
+                            authService.getCurrentUser());
+            return voteForPostByUser.filter(vote -> vote.getVoteType().equals(voteType))
+                    .isPresent();
+        }
+        return false;
+    }
 
 }
