@@ -2,6 +2,7 @@ package com.rafal.totallynotredditclone.service;
 
 import com.rafal.totallynotredditclone.dto.AuthenticationResponse;
 import com.rafal.totallynotredditclone.dto.LoginRequest;
+import com.rafal.totallynotredditclone.dto.RefreshTokenRequest;
 import com.rafal.totallynotredditclone.dto.RegisterRequest;
 import com.rafal.totallynotredditclone.exceptions.EmailException;
 import com.rafal.totallynotredditclone.model.NotificationEmail;
@@ -37,7 +38,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final VerificationTokenRepository verificationTokenRepository;
-
+    private final RefreshTokenService refreshTokenService;
     @Transactional
     public void signup(RegisterRequest registerRequest) {
         User user = new User();
@@ -89,13 +90,30 @@ public class AuthenticationService {
                 loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
-        return new AuthenticationResponse(token, loginRequest.getUsername());
+        return AuthenticationResponse.builder()
+                .authenticationToken(token)
+                .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .username(loginRequest.getUsername())
+                .build();
     }
 
     public boolean isLoggedIn() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
     }
+
+    public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+        refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+        String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
+        return AuthenticationResponse.builder()
+                .authenticationToken(token)
+                .refreshToken(refreshTokenRequest.getRefreshToken())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .username(refreshTokenRequest.getUsername())
+                .build();
+    }
+
 
 }
 
